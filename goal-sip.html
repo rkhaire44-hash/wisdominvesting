@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Goal Planning — SIP — Rupesh Khaire</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+body { margin:0; font-family:'Inter',sans-serif; background:#0d1b34; color:#eaf6ff; }
+main { max-width:900px; margin:0 auto; padding:40px 20px; }
+header { text-align:center; margin-bottom:50px; }
+header h1 { font-size:36px; background: linear-gradient(90deg,#7ee7ff,#b38bff); -webkit-background-clip:text; color:transparent; }
+header p { margin-top:5px; color:#a0bce6; font-size:16px; }
+
+.calculator { background: linear-gradient(135deg,#1c2b4a,#0d1b34); padding:30px; border-radius:16px; border:1px solid rgba(255,255,255,0.05); }
+.calculator label { display:block; margin:15px 0 5px; }
+.calculator input { width:100%; padding:10px; border-radius:8px; border:none; font-size:16px; }
+.calculator button { margin-top:20px; padding:12px 20px; font-size:16px; border:none; border-radius:10px; cursor:pointer; background:linear-gradient(90deg,#7ee7ff,#b38bff); color:#0d1b34; transition:0.3s; }
+.calculator button:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+
+.examples button { margin:5px; padding:8px 12px; font-size:14px; border:none; border-radius:8px; cursor:pointer; background:#4b6cb7; color:#eaf6ff; transition:0.3s; }
+.examples button:hover { background:#7ee7ff; color:#0d1b34; }
+
+canvas { margin-top:30px; background:#0d1b34; border-radius:12px; }
+.result { margin-top:20px; font-size:18px; background:#1c2b4a; padding:15px; border-radius:12px; }
+
+footer { text-align:center; margin-top:60px; color:#a0bce6; font-size:13px; padding-bottom:40px; }
+@media (max-width:600px){ main{padding:20px 10px;} }
+.whatsapp { position:fixed; bottom:20px; right:20px; background:#25d366; color:white; padding:15px 20px; border-radius:50px; font-size:16px; text-decoration:none; box-shadow:0 5px 20px rgba(0,0,0,0.4); }
+</style>
+</head>
+<body>
+<main>
+<header>
+<h1>Rupesh Khaire</h1>
+<p>AMFI Registered Mutual Fund Distributor</p>
+</header>
+
+<div class="calculator">
+  <label>Target Amount (₹)</label>
+  <input type="number" id="target" placeholder="e.g. 20,00,000">
+
+  <label>Expected Annual Return (%)</label>
+  <input type="number" id="rate" placeholder="e.g. 12">
+
+  <label>Time Horizon (Years)</label>
+  <input type="number" id="years" placeholder="e.g. 10">
+
+  <div class="examples">
+    <label>Examples:</label>
+    <button onclick="setExample(500000,10,15)">Child Education</button>
+    <button onclick="setExample(1000000,12,20)">House</button>
+    <button onclick="setExample(2000000,10,25)">Retirement</button>
+  </div>
+
+  <button onclick="calculate()">Calculate & Show Chart</button>
+
+  <div class="result" id="result"></div>
+  <canvas id="growthChart" height="300"></canvas>
+</div>
+
+<a href="https://wa.me/918669095783" target="_blank" class="whatsapp">WhatsApp Rupesh</a>
+
+<footer>
+© 2025 Rupesh Khaire | AMFI Registered Mutual Fund Distributor
+</footer>
+</main>
+
+<script>
+let chart;
+
+function setExample(FV, rate, years){
+  document.getElementById('target').value = FV;
+  document.getElementById('rate').value = rate;
+  document.getElementById('years').value = years;
+  calculate();
+}
+
+function calculate(){
+  const FV = parseFloat(document.getElementById('target').value);
+  const r = parseFloat(document.getElementById('rate').value)/100;
+  const n = parseInt(document.getElementById('years').value);
+  if(isNaN(FV) || isNaN(r) || isNaN(n)) { alert('Enter all values!'); return; }
+
+  // SIP needed: P = FV*r / [(1+r)^n -1]
+  const SIP = FV * r / (Math.pow(1+r,n)-1);
+
+  document.getElementById('result').innerHTML = `You need to invest ₹${Math.round(SIP).toLocaleString()} per year to reach ₹${FV.toLocaleString()} in ${n} years.`;
+
+  // Chart: Growth year by year
+  let labels=[], data=[], total=0;
+  for(let i=1;i<=n;i++){
+    total += SIP * Math.pow(1+r, i-1);
+    labels.push("Year "+i);
+    data.push(total);
+  }
+
+  const ctx = document.getElementById('growthChart').getContext('2d');
+  if(chart) chart.destroy();
+  chart = new Chart(ctx, {
+    type:'line',
+    data:{
+      labels:labels,
+      datasets:[{
+        label:'Projected SIP Growth',
+        data:data,
+        borderColor:'#7ee7ff',
+        backgroundColor:'rgba(126,231,255,0.2)',
+        tension:0.3,
+        fill:true,
+        pointRadius:5
+      }]
+    },
+    options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#eaf6ff' } } }, scales:{ x:{ ticks:{ color:'#eaf6ff' } }, y:{ ticks:{ color:'#eaf6ff' } } } }
+  });
+}
+
+</script>
+</body>
+</html>

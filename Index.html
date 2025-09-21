@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rupesh Khaire — Mutual Fund Calculators</title>
+<style>
+  body {
+    margin:0; font-family: 'Inter', sans-serif; background: linear-gradient(180deg,#071226,#0f2540); color:#eaf6ff;
+  }
+  main { max-width:1200px; margin:0 auto; padding:40px 20px; }
+  header { text-align:center; margin-bottom:60px; }
+  header h1 { font-size:40px; margin:0; background: linear-gradient(90deg,#7ee7ff,#b38bff); -webkit-background-clip:text; color:transparent; }
+  header p { margin-top:10px; color:#a0bce6; font-size:16px; }
+
+  .cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:30px; }
+  .card {
+    background: linear-gradient(135deg,#1c2b4a,#0d1b34);
+    border-radius:16px; padding:30px 20px; cursor:pointer; transition: transform 0.3s, box-shadow 0.3s;
+    border:1px solid rgba(255,255,255,0.05);
+  }
+  .card:hover { transform: translateY(-8px); box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+  .card h2 { margin:0 0 10px 0; font-size:22px; }
+  .card p { margin:0; color:#a0bce6; font-size:14px; }
+
+  footer { text-align:center; margin-top:60px; color:#a0bce6; font-size:13px; padding-bottom:40px; }
+  @media (max-width:600px) { main { padding:20px 10px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Rupesh Khaire</h1>
+    <p>AMFI Registered Mutual Fund Distributor</p>
+  </header>
+
+  <div class="cards">
+    <div class="card" onclick="window.location.href='lumpsum.html'">
+      <h2>💰 Lumpsum Calculator</h2>
+      <p>Calculate the future value of a one-time investment with expected returns and years.</p>
+    </div>
+    <div class="card" onclick="window.location.href='sip.html'">
+      <h2>📈 SIP Calculator</h2>
+      <p>Estimate how monthly SIPs grow into a future corpus with compounding returns.</p>
+    </div>
+    <div class="card" onclick="window.location.href='goal-lumpsum.html'">
+      <h2>🎯 Goal Planning — Lumpsum</h2>
+      <p>Plan your future goals: find the lumpsum needed today to reach your target amount.</p>
+    </div>
+    <div class="card" onclick="window.location.href='goal-sip.html'">
+      <h2>🎯 Goal Planning — SIP</h2>
+      <p>Plan your future goals: calculate the monthly SIP required to reach your target corpus.</p>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Rupesh Khaire | AMFI Registered Mutual Fund Distributor | All Rights Reserved
+  </footer>
+</main>
+</body>
+</html>
