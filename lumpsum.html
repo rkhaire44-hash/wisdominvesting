@@ -5,29 +5,38 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Lumpsum Calculator — Rupesh Khaire</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-  body { margin:0; font-family:'Inter',sans-serif; background:#0d1b34; color:#eaf6ff; }
-  main { max-width:900px; margin:0 auto; padding:40px 20px; }
-  header { text-align:center; margin-bottom:50px; }
-  header h1 { font-size:36px; background: linear-gradient(90deg,#7ee7ff,#b38bff); -webkit-background-clip:text; color:transparent; }
-  header p { margin-top:5px; color:#a0bce6; font-size:16px; }
+body { margin:0; font-family:'Inter',sans-serif; background:#0d1b34; color:#eaf6ff; }
+main { max-width:900px; margin:0 auto; padding:40px 20px; }
+header { text-align:center; margin-bottom:50px; }
+header h1 { font-size:36px; background: linear-gradient(90deg,#7ee7ff,#b38bff); -webkit-background-clip:text; color:transparent; }
+header p { margin-top:5px; color:#a0bce6; font-size:16px; }
 
-  .calculator { background: linear-gradient(135deg,#1c2b4a,#0d1b34); padding:30px; border-radius:16px; border:1px solid rgba(255,255,255,0.05); }
-  .calculator label { display:block; margin:15px 0 5px; }
-  .calculator input { width:100%; padding:10px; border-radius:8px; border:none; font-size:16px; }
-  .calculator button { margin-top:20px; padding:12px 20px; font-size:16px; border:none; border-radius:10px; cursor:pointer; background:linear-gradient(90deg,#7ee7ff,#b38bff); color:#0d1b34; transition:0.3s; }
-  .calculator button:hover { transform:translateY(-3px); box-shadow:0 10px 30px rgba(0,0,0,0.5); }
+.calculator { background: linear-gradient(135deg,#1c2b4a,#0d1b34); padding:30px; border-radius:16px; border:1px solid rgba(255,255,255,0.05); }
+.input-group { margin-bottom: 25px; }
+.input-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.input-label span { font-size: 1.2rem; font-weight: bold; color: #7ee7ff; }
+.input-container { display: flex; align-items: center; gap: 10px; }
+.input-container input[type="number"] { width: 120px; padding: 8px; border-radius: 8px; border: none; font-size: 16px; background: #1c2b4a; color: #eaf6ff; text-align: right; }
+.input-container input[type="range"] { -webkit-appearance: none; width: 100%; height: 8px; background: #555; border-radius: 5px; outline: none; transition: background 0.2s; }
+.input-container input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 20px; height: 20px; border-radius: 50%; background: #b38bff; cursor: pointer; border: 2px solid #fff; }
 
-  .examples button { margin:5px; padding:8px 12px; font-size:14px; border:none; border-radius:8px; cursor:pointer; background:#4b6cb7; color:#eaf6ff; transition:0.3s; }
-  .examples button:hover { background:#7ee7ff; color:#0d1b34; }
+.examples { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 20px; }
+.examples button { margin:5px; padding:8px 12px; font-size:14px; border:none; border-radius:8px; cursor:pointer; background:#4b6cb7; color:#eaf6ff; transition:0.3s; }
+.examples button:hover { background:#7ee7ff; color:#0d1b34; }
 
-  canvas { margin-top:30px; background:#0d1b34; border-radius:12px; }
-  .result { margin-top:20px; font-size:18px; background:#1c2b4a; padding:15px; border-radius:12px; }
+canvas { margin-top:30px; background:#1c2b4a; border-radius:12px; }
+.result { margin-top:20px; font-size:18px; background:#1c2b4a; padding:20px; border-radius:12px; display: flex; justify-content: space-around; text-align: center; }
+.result-item h3 { margin: 0; font-size: 1.1rem; color:#a0bce6; }
+.result-item p { margin: 5px 0 0; font-size: 1.5rem; font-weight: bold; color: #7ee7ff; }
 
-  footer { text-align:center; margin-top:60px; color:#a0bce6; font-size:13px; padding-bottom:40px; }
-  @media (max-width:600px){ main{padding:20px 10px;} }
-  .whatsapp { position:fixed; bottom:20px; right:20px; background:#25d366; color:white; padding:15px 20px; border-radius:50px; font-size:16px; text-decoration:none; box-shadow:0 5px 20px rgba(0,0,0,0.4); }
+footer { text-align:center; margin-top:60px; color:#a0bce6; font-size:13px; padding-bottom:40px; }
+@media (max-width:600px){ 
+  main{padding:20px 10px;} 
+  .result { flex-direction: column; }
+  .result-item { margin-bottom: 20px; }
+}
+.whatsapp { position:fixed; bottom:20px; right:20px; background:#25d366; color:white; padding:15px 20px; border-radius:50px; font-size:16px; text-decoration:none; box-shadow:0 5px 20px rgba(0,0,0,0.4); }
 </style>
 </head>
 <body>
@@ -38,24 +47,40 @@
 </header>
 
 <div class="calculator">
-  <label>Investment Amount (₹)</label>
-  <input type="number" id="amount" placeholder="e.g. 1,00,000">
+  <div class="input-group">
+    <div class="input-label">
+      <label>Investment Amount (₹)</label>
+      <span id="amount-value">1,00,000</span>
+    </div>
+    <div class="input-container">
+      <input type="range" id="amount-range" min="1000" max="100000000" step="1000" value="100000">
+      <input type="number" id="amount-input" min="1000" max="100000000" step="1000" value="100000">
+    </div>
+  </div>
 
-  <label>Expected Annual Return (%)</label>
-  <input type="number" id="rate" placeholder="e.g. 12">
+  <div class="input-group">
+    <div class="input-label">
+      <label>Expected Annual Return (%)</label>
+      <span id="rate-value">12</span>
+    </div>
+    <input type="range" id="rate" min="1" max="30" step="0.5" value="12" oninput="calculate()">
+  </div>
 
-  <label>Investment Period (Years)</label>
-  <input type="number" id="years" placeholder="e.g. 10">
-
+  <div class="input-group">
+    <div class="input-label">
+      <label>Investment Period (Years)</label>
+      <span id="years-value">10</span>
+    </div>
+    <input type="range" id="years" min="1" max="50" step="1" value="10" oninput="calculate()">
+  </div>
+  
   <div class="examples">
     <label>Examples:</label>
     <button onclick="setExample(500000,10,15)">Child Education</button>
     <button onclick="setExample(1000000,12,20)">House</button>
     <button onclick="setExample(2000000,10,25)">Retirement</button>
   </div>
-
-  <button onclick="calculate()">Calculate & Show Chart</button>
-
+  
   <div class="result" id="result"></div>
   <canvas id="growthChart" height="300"></canvas>
 </div>
@@ -70,50 +95,176 @@
 <script>
 let chart;
 
+window.onload = function() {
+  const amountRange = document.getElementById('amount-range');
+  const amountInput = document.getElementById('amount-input');
+
+  amountRange.addEventListener('input', function() {
+    amountInput.value = this.value;
+    calculate();
+  });
+
+  amountInput.addEventListener('input', function() {
+    amountRange.value = this.value;
+    calculate();
+  });
+
+  calculate();
+};
+
 function setExample(amount, rate, years){
-  document.getElementById('amount').value = amount;
+  document.getElementById('amount-range').value = amount;
+  document.getElementById('amount-input').value = amount;
   document.getElementById('rate').value = rate;
   document.getElementById('years').value = years;
   calculate();
 }
 
 function calculate(){
-  const P = parseFloat(document.getElementById('amount').value);
-  const r = parseFloat(document.getElementById('rate').value)/100;
-  const n = parseInt(document.getElementById('years').value);
-  if(isNaN(P) || isNaN(r) || isNaN(n)) { alert('Enter all values!'); return; }
+  const P = parseFloat(document.getElementById('amount-input').value);
+  const r_annual = parseFloat(document.getElementById('rate').value);
+  const n_years = parseInt(document.getElementById('years').value);
+  
+  document.getElementById('amount-value').textContent = P.toLocaleString('en-IN');
+  document.getElementById('rate-value').textContent = r_annual;
+  document.getElementById('years-value').textContent = n_years;
+  
+  const r_decimal = r_annual / 100;
 
-  let FV = P * Math.pow(1+r, n);
-  document.getElementById('result').innerHTML = `Future Value: ₹${FV.toLocaleString()}`;
+  const FV = P * Math.pow(1 + r_decimal, n_years);
+  const wealth_gained = FV - P;
 
-  // Chart data
-  let labels = [], data = [];
-  for(let i=1;i<=n;i++){
-    labels.push("Year "+i);
-    data.push(P*Math.pow(1+r,i));
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = `
+    <div class="result-item">
+      <h3>Initial Investment</h3>
+      <p>₹${Math.round(P).toLocaleString('en-IN')}</p>
+    </div>
+    <div class="result-item">
+      <h3>Est. Returns</h3>
+      <p>₹${Math.round(wealth_gained).toLocaleString('en-IN')}</p>
+    </div>
+    <div class="result-item">
+      <h3>Total Value</h3>
+      <p>₹${Math.round(FV).toLocaleString('en-IN')}</p>
+    </div>
+  `;
+
+  let labels = [];
+  let totalValueData = [];
+  let investmentData = [];
+  
+  for(let i=0; i<=n_years; i++){
+    labels.push(`Year ${i}`);
+    const value = P * Math.pow(1 + r_decimal, i);
+    totalValueData.push(value - P); // This is the returns
+    investmentData.push(P); // This is the principal
   }
 
   const ctx = document.getElementById('growthChart').getContext('2d');
+  
+  const gradientReturns = ctx.createLinearGradient(0, 0, 0, 400);
+  gradientReturns.addColorStop(0, '#7ee7ff');
+  gradientReturns.addColorStop(1, 'rgba(126,231,255,0)');
+  
+  const gradientInvestment = ctx.createLinearGradient(0, 0, 0, 400);
+  gradientInvestment.addColorStop(0, '#b38bff');
+  gradientInvestment.addColorStop(1, 'rgba(179,139,255,0)');
+
+
   if(chart) chart.destroy();
   chart = new Chart(ctx, {
     type:'line',
     data:{
       labels:labels,
       datasets:[{
-        label:'Growth Over Years',
-        data:data,
+        label:'Initial Investment',
+        data:investmentData,
+        borderColor: '#b38bff',
+        backgroundColor: gradientInvestment,
+        tension:0.4,
+        fill: 'start',
+        borderWidth: 2,
+        pointRadius: 0
+      },
+      {
+        label:'Estimated Returns',
+        data:totalValueData,
         borderColor:'#7ee7ff',
-        backgroundColor:'rgba(126,231,255,0.2)',
-        tension:0.3,
-        fill:true,
-        pointRadius:5
+        backgroundColor: gradientReturns,
+        tension:0.4,
+        fill: '-1',
+        borderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 8,
+        pointHoverBackgroundColor: '#7ee7ff',
+        pointHoverBorderColor: 'rgba(255,255,255,0.8)',
+        pointHoverBorderWidth: 2
       }]
     },
-    options:{ responsive:true, plugins:{ legend:{ labels:{ color:'#eaf6ff' } } }, scales:{ x:{ ticks:{ color:'#eaf6ff' } }, y:{ ticks:{ color:'#eaf6ff' } } } }
+    options:{ 
+      responsive:true, 
+      interaction: {
+        mode: 'index',
+        intersect: false,
+      },
+      plugins:{ 
+        legend:{ 
+          labels:{ 
+            color:'#eaf6ff',
+            font: { size: 14 }
+          } 
+        },
+        tooltip: {
+          backgroundColor: '#1c2b4a',
+          titleColor: '#eaf6ff',
+          bodyColor: '#eaf6ff',
+          borderColor: 'rgba(255,255,255,0.2)',
+          borderWidth: 1,
+          cornerRadius: 8,
+          titleFont: { weight: 'bold' },
+          bodyFont: { size: 14 },
+          callbacks: {
+            label: function(context) {
+                let label = context.dataset.label || '';
+                if (label) {
+                    label += ': ';
+                }
+                if (context.parsed.y !== null) {
+                    label += `₹${Math.round(context.parsed.y).toLocaleString('en-IN')}`;
+                }
+                return label;
+            },
+            footer: function(tooltipItems) {
+                const investment = tooltipItems[0].parsed.y;
+                const returns = tooltipItems[1].parsed.y;
+                const total = investment + returns;
+                return `Total Value: ₹${Math.round(total).toLocaleString('en-IN')}`;
+            }
+          }
+        }
+      }, 
+      scales:{ 
+        x:{ 
+          stacked: true,
+          ticks:{ color:'#a0bce6', font: { size: 12 } },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        }, 
+        y:{
+          stacked: true,
+          ticks:{ 
+            color:'#a0bce6', 
+            font: { size: 12 },
+            callback: function(value) {
+              return `₹${(value / 100000).toLocaleString('en-IN')}L`;
+            }
+          },
+          grid: { color: 'rgba(255,255,255,0.1)' } 
+        } 
+      } 
+    }
   });
 }
-
-
 </script>
 </body>
 </html>
